@@ -25,7 +25,7 @@ jobs:
         cache: maven
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
+      uses: android-actions/setup-android@v3
 
     - name: Set up Appium
       run: |
@@ -34,7 +34,7 @@ jobs:
         appium &
 
     - name: Run Appium Tests with Emulator
-      uses: reactivecircus/android-emulator-runner@v2
+      uses: reactivecircus/android-emulator-runner@v3
       with:
         api-level: ${{ matrix.api-level }}
         target: default
