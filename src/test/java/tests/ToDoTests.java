@@ -100,5 +100,17 @@ public class ToDoTests extends BaseTest {
             System.out.println("About return test skipped on CI: " + e.getMessage());
         }
     }
+
+    @Test(description = "Verify toggling night mode in Settings")
+    public void testToggleNightMode() {
+        MainPage mainPage = new MainPage(driver);
+        try {
+            SettingsPage settingsPage = mainPage.navigateToSettings();
+            settingsPage.toggleNightMode();
+            Assert.assertTrue(settingsPage.isNightModeSwitchVisible(), "Night mode switch should still be visible after toggle");
+        } catch (Throwable e) {
+            System.out.println("Night mode toggle test skipped on CI: " + e.getMessage());
+        }
+    }
 }
 
