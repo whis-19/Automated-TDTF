@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Minimal ToDo Appium Tests">
+    <test name="Functional Tests">
+        <classes>
+            <class name="tests.ToDoTests"/>
+        </classes>
+    </test>
+</suite>
