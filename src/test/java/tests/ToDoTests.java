@@ -2,8 +2,10 @@ package tests;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import pages.AboutPage;
 import pages.AddToDoPage;
 import pages.MainPage;
+import pages.SettingsPage;
 import utils.BaseTest;
 
 public class ToDoTests extends BaseTest {
