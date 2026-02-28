@@ -32,4 +32,22 @@ public class MainPage extends BasePage {
         By taskLocator = AppiumBy.xpath("//android.widget.TextView[@text='" + taskText + "']");
         return isElementDisplayed(taskLocator);
     }
+
+    public SettingsPage navigateToSettings() {
+        // Assume menu button -> Settings
+        By menuButton = AppiumBy.accessibilityId("More options");
+        click(menuButton);
+        By settingsOption = AppiumBy.xpath("//android.widget.TextView[@text='Settings']");
+        click(settingsOption);
+        return new SettingsPage(driver);
+    }
+
+    public AboutPage navigateToAbout() {
+        // Assume menu button -> About
+        By menuButton = AppiumBy.accessibilityId("More options");
+        click(menuButton);
+        By aboutOption = AppiumBy.xpath("//android.widget.TextView[@text='About']");
+        click(aboutOption);
+        return new AboutPage(driver);
+    }
 }
