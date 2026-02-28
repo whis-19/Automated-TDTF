@@ -51,4 +51,34 @@ public class ToDoTests extends BaseTest {
 
         Assert.assertFalse(mainPage.isEmptyStateVisible(), "Empty state should not be visible when tasks exist");
     }
+
+    @Test(description = "Verify navigation to Settings page")
+    public void testNavigateToSettings() {
+        MainPage mainPage = new MainPage(driver);
+        SettingsPage settingsPage = mainPage.navigateToSettings();
+        Assert.assertTrue(settingsPage.isNightModeSwitchVisible(), "Should be on Settings page");
+    }
+
+    @Test(description = "Verify returning from Settings page to Main page")
+    public void testReturnFromSettings() {
+        MainPage mainPage = new MainPage(driver);
+        SettingsPage settingsPage = mainPage.navigateToSettings();
+        mainPage = settingsPage.goBack();
+        Assert.assertTrue(mainPage.isEmptyStateVisible() || mainPage.isToDoListVisible(), "Should be back on Main page");
+    }
+
+    @Test(description = "Verify navigation to About page")
+    public void testNavigateToAbout() {
+        MainPage mainPage = new MainPage(driver);
+        AboutPage aboutPage = mainPage.navigateToAbout();
+        Assert.assertTrue(aboutPage.isAppVersionVisible(), "Should be on About page");
+    }
+
+    @Test(description = "Verify returning from About page to Main page")
+    public void testReturnFromAbout() {
+        MainPage mainPage = new MainPage(driver);
+        AboutPage aboutPage = mainPage.navigateToAbout();
+        mainPage = aboutPage.goBack();
+        Assert.assertTrue(mainPage.isEmptyStateVisible() || mainPage.isToDoListVisible(), "Should be back on Main page");
+    }
 }
