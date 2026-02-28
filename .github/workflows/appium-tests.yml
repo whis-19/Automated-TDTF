@@ -8,10 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        api-level: [29]
+    runs-on: macos-12
     
     steps:
     - name: Checkout Code
@@ -24,27 +21,23 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Enable KVM
+    - name: Set up Appium
       run: |
-        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-        sudo udevadm control --reload-rules
-        sudo udevadm trigger --name-match=kvm
+        npm install -g appium@next
+        appium driver install uiautomator2
+        appium &
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+    - name: Install Android SDK packages
+      run: |
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-29;default;x86_64" "emulator"
+        echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd -n test_avd -k "system-images;android-29;default;x86_64" --device "Nexus 6"
+    
+    - name: Start Emulator
+      run: |
+        $ANDROID_HOME/emulator/emulator -avd test_avd -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
+        $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+        sleep 10
+        $ANDROID_HOME/platform-tools/adb shell input keyevent 82
 
-    - name: Run Appium Tests with Emulator
-      uses: reactivecircus/android-emulator-runner@v3
-      with:
-        api-level: ${{ matrix.api-level }}
-        target: default
-        arch: x86_64
-        profile: Nexus 6
-        force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
-        disable-animations: true
-        script: |
-          npm install -g appium@next
-          appium driver install uiautomator2
-          appium &
-          mvn test
+    - name: Run Tests
+      run: mvn test
