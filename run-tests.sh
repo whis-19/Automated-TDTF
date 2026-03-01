@@ -16,8 +16,9 @@ command -v java   >/dev/null 2>&1 || { echo "[ERROR] Java not found. Install JDK
 command -v mvn    >/dev/null 2>&1 || { echo "[ERROR] Maven not found. Install Maven."; exit 1; }
 command -v appium >/dev/null 2>&1 || { echo "[ERROR] Appium not found. Run: npm install -g appium"; exit 1; }
 command -v adb    >/dev/null 2>&1 || { echo "[ERROR] ADB not found. Set ANDROID_HOME."; exit 1; }
+command -v allure >/dev/null 2>&1 || echo "[WARN]  Allure CLI not found. Install from https://docs.qameta.io/allure/"
 
-echo "[OK] All prerequisites found."
+echo "[OK] Prerequisites checked."
 echo ""
 
 # --- Check for running device / emulator ---
@@ -37,24 +38,39 @@ echo ""
 # --- Run Maven tests ---
 echo "Running tests via Maven..."
 echo ""
+set +e   # don't exit on test failures
 mvn test
+TEST_EXIT=$?
+set -e
 
-# --- Generate HTML report ---
+# --- Generate Allure Report ---
 echo ""
-echo "Generating HTML test report..."
-mvn surefire-report:report-only -q
+if command -v allure >/dev/null 2>&1; then
+    echo "Generating Allure report..."
+    allure generate target/allure-results --clean -o target/allure-report
+    echo "[OK] Report saved to: target/allure-report/index.html"
+    # Open on macOS
+    if [ "$(uname)" = "Darwin" ]; then
+        open target/allure-report/index.html
+    else
+        echo "Open target/allure-report/index.html in your browser."
+    fi
+else
+    echo "Generating fallback surefire HTML report..."
+    mvn surefire-report:report-only -q
+    echo "[OK] Report saved to: target/site/surefire-report.html"
+    if [ "$(uname)" = "Darwin" ] && [ -f "target/site/surefire-report.html" ]; then
+        open target/site/surefire-report.html
+    fi
+fi
+
+# --- Stop Appium ---
+kill $APPIUM_PID 2>/dev/null || true
 
 echo ""
 echo "==================================================="
 echo " Test run complete!"
-echo " Report: target/site/surefire-report.html"
 echo "==================================================="
 echo ""
 
-# --- Stop Appium ---
-kill $APPIUM_PID 2>/dev/null
-
-# --- Open report (macOS) ---
-if [ "$(uname)" = "Darwin" ] && [ -f "target/site/surefire-report.html" ]; then
-    open target/site/surefire-report.html
-fi
+exit $TEST_EXIT
