@@ -62,13 +62,23 @@ This project is an Appium-based automated testing framework for the Minimal-Todo
    This will start an Appium server container and a test runner container that executes the tests automatically.
 
 ### Generating Test Reports
-After running tests, generate the HTML report:
+After running tests, generate the Allure HTML report:
 ```bash
-mvn surefire-report:report-only
+allure generate target/allure-results --clean -o target/allure-report
 ```
-Reports are saved to `target/site/surefire-report.html`.
+Reports are saved to `target/allure-report/`.
 
-In CI, reports are automatically uploaded as artifacts and can be downloaded from the GitHub Actions run page.
+In CI, the rendered report is automatically uploaded as an artifact and can be downloaded from the GitHub Actions run page.
+
+**How to view the downloaded report:**
+Because of browser security restrictions, the `index.html` file cannot be opened directly from the file system. You must serve it over HTTP:
+
+```bash
+# Option 1 — Python (easiest, works on Windows too)
+cd allure-report
+python -m http.server 8080
+# then open: http://localhost:8080
+```
 
 ## Test Cases (10 Functional Tests)
 | # | Test Name | Description |
